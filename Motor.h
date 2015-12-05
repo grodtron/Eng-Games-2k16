@@ -44,3 +44,14 @@ const int STARBOARD_DIR = 4;
   MOVE_WHEEL_BAK(PORT, AMOUNT); \
   MOVE_WHEEL_BAK(STARBOARD, AMOUNT);  \
 } while(0)
+
+#define TURN_PS(AMOUNT) do {  \
+  MOVE_WHEEL_FWD(PORT, 0); \
+  MOVE_WHEEL_FWD(STARBOARD, AMOUNT);  \
+} while(0
+
+#define TURN_SB(AMOUNT) do {  \
+  MOVE_WHEEL_FWD(PORT, AMOUNT); \
+  MOVE_WHEEL_FWD(STARBOARD, 0); \
+} while(0)
+
