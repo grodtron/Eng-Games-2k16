@@ -1,12 +1,15 @@
 /*
  * Auther: Ryan Cooke
  * Subject: Concordia Eng Games Machine Motor header
- * save date:12/04/2015
+ * save date:12/05/2015
  * I2C Motor shield 
  */
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_PWMServoDriver.h"
+
+class Motor {
+private:
 
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
@@ -14,11 +17,43 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 // Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61); 
 
 // Select which 'port' M1, M2, M3 or M4. In this case, M1
-Adafruit_DCMotor *myMotor_P = AFMS.getMotor(1);
-Adafruit_DCMotor *myMotor_S = AFMS.getMotor(2);
-// You can also make another motor on port M2
-//Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(2);
+Adafruit_DCMotor *myMotor_0 = AFMS.getMotor(1);
+Adafruit_DCMotor *myMotor_1 = AFMS.getMotor(2);
 
+const int PT=1;
+const int SB=0;
+
+void MOVE_WHEEL_FWD(bool SIDE, int  AMOUNT) { 
+  if(SIDE==0) 
+  { 
+    myMotor_0->run(FORWARD); 
+    myMotor_0->setSpeed(AMOUNT);  
+  } 
+  if(SIDE==1)
+  { 
+    myMotor_1->run(FORWARD); 
+    myMotor_1->setSpeed(AMOUNT); 
+  } 
+} 
+
+void MOVE_WHEEL_BAK(bool SIDE,int AMOUNT){ 
+  if(SIDE==0) 
+  { 
+    myMotor_0->run(BACKWARD); 
+    myMotor_0->setSpeed(AMOUNT); 
+  } 
+  if(SIDE==1) 
+  { 
+    myMotor_1->run(BACKWARD); 
+    myMotor_1->setSpeed(AMOUNT); 
+  } 
+} 
+
+
+
+
+
+public:
 
 const int N_MOTORS = 2;
 
@@ -29,62 +64,63 @@ const int STARBOARD_PWM = 6;
 const int PORT_DIR  = 3;// PWM PIN BUT NOT NEEDED TO BE
 const int STARBOARD_DIR = 4;
 
-#define MOVE_WHEEL_FWD(SIDE, AMOUNT) do { \
-  if(SIDE=="PORT")\
-  {\
-    myMotor_P->run(FORWARD);\
-    myMotor_P->setSpeed(AMOUNT);\  
-  }\
-  if(SIDE=="STARBOARD")\
-  {\
-    myMotor_S->run(FORWARD);\
-    myMotor_S->setSpeed(AMOUNT);\ 
-  }\
-} while(0)
+void setup(){
+  AFMS.begin();  // create with the default frequency 1.6KHz
+   // Set the speed to start, from 0 (off) to 255 (max speed)
+  myMotor_0->setSpeed(150);
+  myMotor_0->run(FORWARD);
+  // turn on motor
+  myMotor_0->run(RELEASE);
+  
+  myMotor_1->setSpeed(150);
+  myMotor_1->run(FORWARD);
+  // turn on motor
+  myMotor_1->run(RELEASE);
+}
 
-#define MOVE_WHEEL_BAK(SIDE, AMOUNT) do { \
-  if(SIDE==PORT)\
-  {\
-    myMotor_P->run(BACKWARD);\
-    myMotor_P->run(BACKWARD);\
-  }\
-  if(SIDE==STARBOARD)\
-  {\
-    myMotor_S->run(BACKWARD);\
-    myMotor_S->setSpeed(AMOUNT); \
-  }\
-} while(0)
+void set_PWM(int zero, int one)// 0 is left and 1 is right wheel
+{
+  myMotor_0->setSpeed(zero);
+  myMotor_1->setSpeed(one);
+}
 
 
-#define SPIN_PS(AMOUNT) do {  \
-  MOVE_WHEEL_BAK("PORT", AMOUNT); \
-  MOVE_WHEEL_FWD("STARBOARD", AMOUNT);  \
-} while(0)
+void SPIN_LEFT(int AMOUNT) {  
+  MOVE_WHEEL_BAK(PT, AMOUNT); 
+  MOVE_WHEEL_FWD(SB, AMOUNT);  
+} 
 
 
-#define SPIN_SB(AMOUNT) do {  \
-  MOVE_WHEEL_FWD("PORT", AMOUNT); \
-  MOVE_WHEEL_BAK("STARBOARD", AMOUNT);  \
-} while(0)
+void SPIN_RIGHT(int AMOUNT)  {  
+  MOVE_WHEEL_FWD(PT, AMOUNT); 
+  MOVE_WHEEL_BAK(SB, AMOUNT); 
+} 
 
-#define FWD(AMOUNT) do {  \
-  MOVE_WHEEL_FWD("PORT", AMOUNT); \
-  MOVE_WHEEL_FWD("STARBOARD", AMOUNT);  \
-} while(0)
+void FWD(int AMOUNT) {  
+  MOVE_WHEEL_FWD(PT, AMOUNT); 
+  MOVE_WHEEL_FWD(SB, AMOUNT); 
+} 
 
-#define BAK(AMOUNT) do {  \
-  MOVE_WHEEL_BAK("PORT", AMOUNT); \
-  MOVE_WHEEL_BAK("STARBOARD", AMOUNT);  \
-} while(0)
+void BAK(int AMOUNT) {  
+  MOVE_WHEEL_BAK(PT, AMOUNT); 
+  MOVE_WHEEL_BAK(SB, AMOUNT);  
+} 
 
-#define TURN_PS(AMOUNT) do {  \
-  MOVE_WHEEL_FWD("PORT", 0); \
-  MOVE_WHEEL_FWD("STARBOARD", AMOUNT);  \
-} while(0
+void TURN_LEFT(int AMOUNT) {  
+  MOVE_WHEEL_FWD(PT, 50); 
+  MOVE_WHEEL_FWD(SB, AMOUNT);  
+} 
 
-#define TURN_SB(AMOUNT) do {  \
-  MOVE_WHEEL_FWD("PORT", AMOUNT); \
-  MOVE_WHEEL_FWD("STARBOARD", 0); \
-} while(0)
+void TURN_RIGHT(int AMOUNT) {  
+  MOVE_WHEEL_FWD(PT, AMOUNT); 
+  MOVE_WHEEL_FWD(SB, 50); 
+} 
 
+void  STOP() {
+  MOVE_WHEEL_FWD(PT, 0); 
+  MOVE_WHEEL_FWD(SB, 0);
+}
+
+
+};
 

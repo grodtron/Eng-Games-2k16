@@ -9,7 +9,8 @@
 #include "utility/Adafruit_PWMServoDriver.h"// for I2C Motor sheild NOT FOR COMP
 #include <math.h>
 #include "Gyro.h"
-#include "Motor.h"
+//#include "Motor.h"
+#include "Motor_Sheild.h"
 PS2X ps2x; // create PS2 Controller Class
 
 #include <SoftwareSerial.h>// We'll use SoftwareSerial to communicate with the XBee:
@@ -31,14 +32,16 @@ float angle;// Heading asked by the controller
 float delta_angle;// Delta between requested heading and actual heading updated in the locate() funtions
 float heading;// Heading Measured by Gyro
 void xbee_check();
-
+bool forward=1;// 
+int left_off=0;
+int right_off=0;
+const int delta=5;//
+int PWM;
 
 Gyro gyro;
 
-Adafruit_MotorShield AFMS = Adafruit_MotorShield();
-// Create the motor shield object with the default I2C address 0x61
-Adafruit_DCMotor *myMotor = AFMS.getMotor(1);
-// Select which 'port' M1, M2, M3 or M4. In this case, M1
+
+Motor badger;// This is the object for the 2x Motor setup
 
 
 void setup(){
@@ -49,14 +52,11 @@ void setup(){
   error = ps2x.config_gamepad(13,8,7,12, true, true);   //setup pins and settings:  GamePad(clock, command, attention, data, Pressures?, Rumble?) check for error
   Serial.print(error);
   
-  AFMS.begin();  // create with the default frequency 1.6KHz
-  // Set the speed to start, from 0 (off) to 255 (max speed)
-  myMotor->setSpeed(150);
-  myMotor->run(FORWARD);
-  // turn on motor
-  myMotor->run(RELEASE);
+   badger.setup();
   
   gyro.callibrate();
+
+  PWM=0;
 }
 
 
@@ -100,9 +100,24 @@ void loop(){
     RX=ps2x.Analog(PSS_RX);
     RY=ps2x.Analog(PSS_RY);
     
-    if(ps2x.Button(PSB_L1)|| ps2x.Button(PSB_R1)){
+    //heading=gyro.value(); // Still testing with value.cor()
+    //delta_angle=(angle-heading);
+
+
+    
+    if( ps2x.Button(PSB_R1)){
+      forward=1;
+      if(PWM<150)
+      {
+        PWM=150;
+      }
+      if(PWM!=255)
+      {
+      PWM++;
+      }
+      //Serial.println(PWM);
       
-      locate(LX,LY);
+      //locate_deg(LX,LY);
       /*
       Serial.print("LX, LY ");
       ss1.print(LX);
@@ -110,12 +125,58 @@ void loop(){
       ss1.println(LY);
       */
     }
-    myMotor->setSpeed(RX);
+    if( ps2x.Button(PSB_L1)){
+      forward=0;
+      if(PWM<150)
+      {
+        PWM=150;
+      }
+      if(PWM!=255)
+      {
+      PWM++;
+      }
+      badger.BAK(PWM);
+    }
+    
+     if(ps2x.Button(PSB_PINK))
+     {
+      PWM=0;
+      badger.STOP();
+     }
+     if(ps2x.Button(PSB_GREEN))
+     {
+      PWM=255;
+      forward=1;
+     }
+     if(ps2x.Button(PSB_RED))
+     {
+      PWM=255;
+      forward=0;f
+      badger.BAK(PWM);
+     }
+         if(ps2x.Button(PSB_PAD_LEFT))
+    {
+      forward=0;
+      badger.TURN_LEFT(PWM);
+    }
+
+    if(ps2x.Button(PSB_PAD_RIGHT))
+    {
+      forward=0;
+      badger.TURN_RIGHT(PWM);
+
+    }
+    
+     if(forward==1)
+     {
+     badger.FWD(PWM);
+     }
+     
   }
   
 }
 
-int locate(signed int xaxis,signed int yaxis)
+int locate_deg(signed int xaxis,signed int yaxis)
 {
   
   /*
@@ -128,13 +189,7 @@ int locate(signed int xaxis,signed int yaxis)
   angle= atan2(yaxis,xaxis);// Calculate the angle form the coordinates
   angle=angle*57.2958;// radian to degrees
   delta_angle=(angle-heading);
-  
-  if((delta_angle<5) &&(delta_angle>(-5)))
-  {
-    Serial.println("Exit Recursion");
-    return 1;
-  }
-  
+
   //********************************* Printing used for testing
   Serial.print("X,Y: ");
   Serial.print(xaxis);
@@ -167,3 +222,67 @@ int locate(signed int xaxis,signed int yaxis)
   * Without the delay the connection between the remote and the receiver would be lost
   */
 }
+
+
+
+int locate( int x, int y)
+{
+  /*
+   * This unfction will be using x & y coordinates to figure out the direction wanted up to 8 directions 45 degrees from each other
+   *  x - y value
+   *  128 - 128  Joystick centered  action: nothing
+   *  255 - 128  Joystick East  action: 0 degrees
+   *  000 - 128  Joystick West  action: 180 degrees
+   *  128 - 000  Joystick North  action  90 degrees
+   *  128 - 255  Joystick South  action -90 degrees
+   *  
+   *  this function has two inputs that correspond with the x and y axis of the joystick.  
+   */
+   const int low=0;
+   const int mid=128;
+   const int high=255;
+   
+  
+  if((x>(mid-delta))&&(x<(mid+delta))&&(y>(mid-delta))&&(y<(mid+delta)))
+  {
+    // Joystick is centered.
+    return 1;
+  }
+  else if((x>(mid-delta))&&(x<(mid+delta))&&(y<(low+delta)))
+  {
+    angle= 90;//  Aim @ 90 degrees 
+    return 0;
+  }
+  else if ((x<(low+delta))&&(y>(mid-delta))&&(y<(mid+delta)))
+  {
+    angle=-180;// Aim @ 180 degrees
+    return 0;
+  }
+    else if((x>(mid-delta))&&(x<(mid+delta))&&(y>(high-delta)))
+  {
+    angle= -90;//  Aim @ -90 degrees 
+    return 0;
+  }
+  else if ((x>(high-delta))&&(y>(mid-delta))&&(y<(mid+delta)))
+  {
+    angle=0;// Aim @ 0 degrees
+    return 0;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
