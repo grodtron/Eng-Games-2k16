@@ -33,13 +33,9 @@ bool forward=0;//
 int left_off=0;
 int right_off=0;
 int PWM;
-int count;
-int sample_x=0;
-int sample_y=0;
-const int loops=10;
-int sample_array[loops][1];
-int x=0;
-int y=0;
+int count = 0;
+int loops=5;
+
 Gyro gyro;
 
 
@@ -64,8 +60,11 @@ void setup(){
 //****************************************************************************START LOOP
 void loop(){
   //Serial.println(PWM);
+ /*
+  
   if(count>loops)
   {
+      
     count=0;
       x=x/(loops+1);
       y=y/(loops+1);
@@ -84,22 +83,12 @@ void loop(){
         }
         LX=LX+sample_array[i][0];
         LY=LY+sample_array[i][1];
-/*
-      Serial.print(sample_array[i][0]);
-      Serial.print(" , ");
-      Serial.println(sample_array[i][1]);
-*/
       }
        // Serial.println("LOOP");
 
       LX=LX/(loops);
       LY=LY/(loops);
-      /*
-      Serial.print("CORRECTED AV ");
-      Serial.print(LX);
-      Serial.print(" , ");
-      Serial.println(LY);
-      */
+
   }
   else
   {
@@ -114,6 +103,9 @@ void loop(){
     sample_array[count][1]=LY;
     count++;
   }
+
+ */
+ 
   /* You must Read Gamepad to get new values
   Read GamePad and set vibration values
   ps2x.read_gamepad(small motor on/off, larger motor strenght from 0-255)
@@ -149,14 +141,16 @@ void loop(){
    
     if( ps2x.Button(PSB_R1)){
       forward=1;
-      if(PWM<150)
+      if(PWM<50)
       {
-        PWM=150;
+        PWM=50;
       }
       if(PWM!=255)
       {
       PWM++;
       }
+
+      badger.FWD(PWM);
     }
 
     if( ps2x.Button(PSB_L1)){
@@ -179,14 +173,13 @@ void loop(){
       badger.STOP();
       return;
      }
-     if(ps2x.Button(PSB_GREEN))
+     if(ps2x.Button(PSB_R2))
      {
       PWM=255;
       forward=1;
       badger.FWD(PWM);
-      return;
      }
-     if(ps2x.Button(PSB_RED))
+     if(ps2x.Button(PSB_L2))
      {
       PWM=255;
       forward=0;
@@ -202,7 +195,6 @@ void loop(){
      {
      badger.flipper_off();
      }
-     /*
      if(ps2x.Button(PSB_PAD_LEFT))
      {
       forward=0;
@@ -210,9 +202,9 @@ void loop(){
       { 
         PWM=150;
       }
-      badger.TURN_LEFT(PWM);
-      count=0;
+      badger.SPIN_LEFT(PWM);
     }
+
 
 
 
@@ -223,9 +215,9 @@ void loop(){
       {
         PWM=150;
       }
-      badger.TURN_RIGHT(PWM);
-      count=0;
+      badger.SPIN_RIGHT(PWM);
     }
+
     
     if(ps2x.Button(PSB_PAD_UP))
     {
@@ -237,25 +229,22 @@ void loop(){
      badger.FWD(PWM);
 
     }
-    */
+
+    if(!(ps2x.Button(PSB_PAD_RIGHT))&& !(ps2x.Button(PSB_PAD_LEFT))&&!(ps2x.Button(PSB_PAD_UP))&&!(ps2x.Button(PSB_R1))&&!(ps2x.Button(PSB_R2))&&!(ps2x.Button(PSB_L2))&&!(ps2x.Button(PSB_L1)))
+    {
+      badger.STOP();
+    }
+
+
+    /*
      Serial.println(LX);
      if(PWM>150)
-     {
-      if((LX<50)&&(forward))
-      {
-        badger.TURN_LEFT(PWM);
-      }
-      else if((LX>55)&&(LX<200)&&(forward))
-      {
-        badger.FWD(PWM);
-      }
-      else if((LX>205)&&(forward))
-      {
-       // Serial.println(x);
-        badger.TURN_RIGHT(PWM);
-      }
+    {
+     badger.FWD(PWM);
      }
-     //** END OF LOOP
+
+     */
+       //** END OF LOOP
   }
   
 }
