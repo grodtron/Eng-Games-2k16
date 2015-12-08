@@ -16,7 +16,11 @@ class Gyro {
     float  current_t;
     float sample;
     float sample_with_error;
-    float error_per_sec;
+    float error_per_sec;  
+    float angle=0;// Heading asked by the controller
+    float delta_angle;// Delta between requested heading and actual heading updated in the locate() funtions
+    float heading;// Heading Measured by Gyro    
+    const int delta=10;//
     
     float area (float t1, float y1, float t2, float y2)
     {
@@ -96,6 +100,84 @@ class Gyro {
        */
       return sample_with_error;
     }
-   
+
+    float get_delta()
+    {
+      /*
+       * Return Delta angle between gyro and heading
+       */
+      return delta_angle;
+    }
+
+        
+    int locate_deg(signed int xaxis,signed int yaxis)
+    {
+      xaxis=xaxis-128;// Center the X axis of the joystick
+      yaxis=yaxis-128;// Center the Y axis of the joystick
+      angle= atan2(yaxis,xaxis);// Calculate the angle form the coordinates
+      angle=angle*57.2958;// radian to degrees
+      delta_angle=(angle-sample);
+
+      //Serial.print("LOCATE DELTA: ");
+      //Serial.println(delta_angle);
+
+    }
+
+    
+    
+       
+    int locate( int x, int y)
+    {
+      /*
+       * This unfction will be using x & y coordinates to figure out the direction wanted up to 8 directions 45 degrees from each other
+       *  x - y value
+       *  128 - 128  Joystick centered  action: nothing
+       *  255 - 128  Joystick East  action: 0 degrees
+       *  000 - 128  Joystick West  action: 180 degrees
+       *  128 - 000  Joystick North  action  90 degrees
+       *  128 - 255  Joystick South  action -90 degrees
+       *  
+       *  this function has two inputs that correspond with the x and y axis of the joystick.  
+       */
+       const int low=0;
+       const int mid=128;
+       const int high=255;
+       
+      
+      if((x>(mid-delta))&&(x<(mid+delta))&&(y>(mid-delta))&&(y<(mid+delta)))
+      {
+        // Joystick is centered.
+        return 1;
+      }
+      else if((x>(mid-delta))&&(x<(mid+delta))&&(y<(low+delta)))
+      {
+        angle= 90;//  Aim @ 90 degrees 
+        return 0;
+      }
+      else if ((x<(low+delta))&&(y>(mid-delta))&&(y<(mid+delta)))
+      {
+        angle=-180;// Aim @ 180 degrees
+        return 0;
+      }
+        else if((x>(mid-delta))&&(x<(mid+delta))&&(y>(high-delta)))
+      {
+        angle= -90;//  Aim @ -90 degrees 
+        return 0;
+      }
+      else if ((x>(high-delta))&&(y>(mid-delta))&&(y<(mid+delta)))
+      {
+        angle=0;// Aim @ 0 degrees
+        return 0;
+      }
+
+      delta_angle=(angle-sample);
+
+    }
+
+
+
+
+
+
 };
 
