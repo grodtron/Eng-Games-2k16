@@ -1,43 +1,12 @@
-#include <PS2X_lib.h>
 #include "Point.h"
-PS2X controller;
-
-int controller_error;
-
-void init_controller(){
-  do{
-    controller_error = controller.config_gamepad(13,8,7,12,
-      true/*analog*/,
-      false/*rumble*/);
-  
-    if(controller_error){
-      Serial.print("Controller Error: ");
-      Serial.println(controller_error);
-    }
-  }while(controller_error);
-  Serial.println("Controller connected");
-}
-
-void read_controller(){
-  static int error_count = 0;
-  if(controller.read_gamepad()){
-    ++error_count;
-  }else{
-    error_count = 0;
-  }
-
-  if(error_count > 10){
-    error_count = 0;
-    init_controller();
-  }
-
-}
+#include "Controller.h"
+Controller controller(13,8,7,12);
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting...");
 
-  init_controller();
+  controller.init();
 
   Serial.println("Done!");
   Serial.parseInt();
@@ -45,7 +14,7 @@ void setup() {
 
 void loop() {
 
-  read_controller();
+  controller.read();
   
   Point left(
     controller.Analog(PSS_LX),
