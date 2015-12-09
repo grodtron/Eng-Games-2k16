@@ -14,14 +14,14 @@ class Controller : public PS2X{
     Point left;
     Point right;
   private:
-    void update_analog_sticks(){
-      left.x *= 9;
-      left.x += Analog(PSS_RX);
-      left.x /= 10;
+    void update_analog_sticks(){      
+      left.x *= 95;
+      left.x += (Analog(PSS_RX) - 128) * 5;
+      left.x /= 100;
 
-      left.y *= 9;
-      left.y += Analog(PSS_RY);
-      left.y /= 10;
+      left.y *= 95;
+      left.y += (128 - Analog(PSS_RY)) * 5;
+      left.y /= 100;
 
       //TODO
     }
