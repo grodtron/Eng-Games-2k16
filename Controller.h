@@ -1,5 +1,7 @@
 #include <PS2X_lib.h>
 
+#include "Point.h"
+
 class Controller : public PS2X{
   private:
     const int param1;
@@ -8,6 +10,21 @@ class Controller : public PS2X{
     const int param4;
 
     int error_count;
+
+    Point left;
+    Point right;
+  private:
+    void update_analog_sticks(){
+      left.x *= 9;
+      left.x += Analog(PSS_RX);
+      left.x /= 10;
+
+      left.y *= 9;
+      left.y += Analog(PSS_RY);
+      left.y /= 10;
+
+      //TODO
+    }
 
   public:
   Controller(int p1, int p2, int p3, int p4)
@@ -29,7 +46,12 @@ class Controller : public PS2X{
     }while(error);
     Serial.println("Controller connected");
   }
-  
+
+  /**
+   * Try to read the game pad taking into account the number of successive errors.
+   * 
+   * After 10 errors in a row, try to re-initialize the pad.
+   */
   bool read(){
     if(this->read_gamepad()){
       ++error_count;
@@ -42,10 +64,14 @@ class Controller : public PS2X{
       return false;
     }else{
       error_count = 0;
+      update_analog_sticks();
       return true;
     }
   }
 
+  Point get_left(){
+    return left;
+  }
 
 };
 
