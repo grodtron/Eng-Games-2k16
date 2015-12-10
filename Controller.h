@@ -1,3 +1,6 @@
+#ifndef CONTROLLER_H_
+#define CONTROLLER_H_
+
 #include <PS2X_lib.h>
 
 #include "Point.h"
@@ -75,3 +78,4 @@ class Controller : public PS2X{
 
 };
 
+#endif

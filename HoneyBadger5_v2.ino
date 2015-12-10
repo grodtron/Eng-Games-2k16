@@ -8,6 +8,14 @@ Adafruit_MotorShield AFMS;
 Adafruit_DCMotor *leftMotor  = AFMS.getMotor(1);
 Adafruit_DCMotor *rightMotor = AFMS.getMotor(2);
 
+// Define state_func type and declare global state variable
+typedef void (*state_func)(void);
+state_func current_state;
+
+#include "state_bumrush.h"
+#include "state_start_wait.h"
+#include "state_normal.h"
+
 #include <math.h>
 
 void setup() {
@@ -17,6 +25,10 @@ void setup() {
   controller.init();
 
   AFMS.begin();
+  leftMotor->run(RELEASE);
+  rightMotor->run(RELEASE);
+
+  current_state = state_start_wait;
 
   Serial.println("Done!");
 
@@ -25,46 +37,6 @@ void setup() {
 void loop() {
 
   if(controller.read()){
-  
-    Point left = controller.get_left();
-  
-    //left.print_self("left");
-
-    float magnitude = left.magnitude();
-
-    //Serial.print(magnitude);
-    //left.print_self(" left");
-    
-    if(magnitude > 75){
-      float angle = atan2(left.x, left.y) * 180 / PI;
-      Serial.print("Running at: ");
-      Serial.println(angle);
-
-      const int cutoff_angle = 70;
-
-      int fast = 255;
-      
-      int slow;
-      if(abs(angle) <= cutoff_angle){
-        slow = map(angle,0, cutoff_angle, 255, 128);
-      }else{
-        slow = 0;
-      }
-
-      if(angle < 0){
-        leftMotor->setSpeed(slow);
-        rightMotor->setSpeed(fast);        
-      }else{
-        leftMotor->setSpeed(fast);
-        rightMotor->setSpeed(slow);
-      }
-
-      leftMotor->run(FORWARD);
-      rightMotor->run(FORWARD);
-
-    }else{
-      rightMotor->run(RELEASE);
-      leftMotor->run(RELEASE);      
-    }
+    current_state();
   }
 }
