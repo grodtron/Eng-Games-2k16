@@ -14,6 +14,9 @@ Adafruit_MotorShield AFMS;
 Adafruit_DCMotor *leftMotor  = AFMS.getMotor(1);
 Adafruit_DCMotor *rightMotor = AFMS.getMotor(2);
 
+Adafruit_DCMotor *flipperMotor = AFMS.getMotor(4);
+
+
 // Define state_func type and declare global state variable
 typedef void (*state_func)(void);
 state_func current_state;
@@ -25,8 +28,9 @@ state_func current_state;
 
 #include <math.h>
 
-void turnOffBrushless(){
-  brushless.setThrottle(0);
+bool turnOffFlipper = false;
+void turnOffFlipperMotor(){
+  turnOffFlipper = true;
 }
 
 void setup() {
@@ -37,7 +41,7 @@ void setup() {
 
   controller.init();
 
-  limit.setCallback(turnOffBrushless);
+  limit.setCallback(turnOffFlipperMotor);
 
   AFMS.begin();
   leftMotor->run(RELEASE);
@@ -50,6 +54,12 @@ void setup() {
 }
 
 void loop() {
+
+  if(turnOffFlipper){
+    flipperMotor->setSpeed(0);
+    flipperMotor->run(RELEASE);
+    turnOffFlipper = false;
+  }
 
   if(controller.read()){
     current_state();

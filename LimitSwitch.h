@@ -6,6 +6,7 @@ class LimitSwitch {
     LimitSwitch(int pin)
       : pin(pin)
     {
+      pinMode(pin, INPUT);
       digitalWrite(pin, HIGH);  //turn on pull up resistor for flow sensor on pin 2
     }
 
