@@ -11,11 +11,13 @@ LimitSwitch limit(2);
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 Adafruit_MotorShield AFMS;
-Adafruit_DCMotor *leftMotor  = AFMS.getMotor(1);
-Adafruit_DCMotor *rightMotor = AFMS.getMotor(2);
+Adafruit_DCMotor *motorLEFT  = AFMS.getMotor(1);
+Adafruit_DCMotor *motorRIGHT = AFMS.getMotor(2);
 
 Adafruit_DCMotor *flipperMotor = AFMS.getMotor(4);
 
+#include "Motors.h"
+Motors motors;
 
 // Define state_func type and declare global state variable
 typedef void (*state_func)(void);
@@ -44,8 +46,8 @@ void setup() {
   limit.setCallback(turnOffFlipperMotor);
 
   AFMS.begin();
-  leftMotor->run(RELEASE);
-  rightMotor->run(RELEASE);
+  motorLEFT->run(RELEASE);
+  motorRIGHT->run(RELEASE);
 
   current_state = state_testing_brushless;//state_start_wait;
 
@@ -64,4 +66,5 @@ void loop() {
   if(controller.read()){
     current_state();
   }
+  motors.update();
 }

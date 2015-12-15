@@ -40,11 +40,11 @@ void state_bumrush(){
     r_speed = constrain(r_speed + 1, 0, 255);
   }
 
-  leftMotor->setSpeed(l_speed);
-  rightMotor->setSpeed(r_speed);
+  motorLEFT->setSpeed(l_speed);
+  motorRIGHT->setSpeed(r_speed);
 
-  leftMotor->run(FORWARD);
-  rightMotor->run(FORWARD);
+  motorLEFT->run(FORWARD);
+  motorRIGHT->run(FORWARD);
 
   // Exit this state if any of the normal buttons are pressed
   if(controller.Button(PSB_RED)){
