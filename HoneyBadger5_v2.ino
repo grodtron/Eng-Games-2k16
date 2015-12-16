@@ -49,7 +49,7 @@ void setup() {
   motorLEFT->run(RELEASE);
   motorRIGHT->run(RELEASE);
 
-  current_state = state_testing_brushless;//state_start_wait;
+  current_state = state_testing;//state_start_wait;
 
   Serial.println("Done!");
 
