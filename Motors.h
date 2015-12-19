@@ -57,6 +57,12 @@ class Motors {
     right(0), rightTarget(0),
     lastUpdateTime(millis() - DELAY_TIME)
     {}
+
+    void setSpeedImmediate(int newLeft, int newRight){
+      leftTarget  = left  = newLeft;
+      rightTarget = right = newRight;
+      update();
+    }
   
     void setTargetSpeed(int newLeftTarget, int newRightTarget){
       if(leftTarget != newLeftTarget && rightTarget != newRightTarget){

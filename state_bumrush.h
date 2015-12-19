@@ -12,34 +12,24 @@ void state_bumrush(){
   static int l_speed = L_SPEED;
   static int r_speed = R_SPEED;
 
+  bool boost = controller.Button(PSB_R2);
+
   // Angle slightly more left
   if(controller.Button(PSB_PAD_LEFT)){
-      l_speed = 100;
-      r_speed = 254;
+      l_speed = boost ? 100 : 100;
+      r_speed = boost ? 254 : 200;
     }
   // Angle slightly more right
   else if(controller.Button(PSB_PAD_RIGHT)){
-      l_speed = 200;
-      r_speed = 200;
-  }
-  // Slow down with back on the D-pad
-  else if(controller.Button(PSB_PAD_DOWN)){
-    l_speed = constrain(l_speed - 1, 0, 255);
-    r_speed = constrain(r_speed - 1, 0, 255);
-  }
-  // Speed up with forward on the D-pad
-  else if(controller.Button(PSB_PAD_UP)){
-    l_speed = constrain(l_speed + 1, 0, 255);
-    r_speed = constrain(r_speed + 1, 0, 255);
-    brushless.setThrottle(150);
+      l_speed = boost ? 255 : 180;
+      r_speed = boost ? 255 : 180;
   }
   else {
-    l_speed = constrain(L_SPEED, 0, 255);
-    r_speed = constrain(R_SPEED, 0, 255);
+    l_speed = constrain(L_SPEED + (boost ? 0 : -50), 0, 255);
+    r_speed = constrain(R_SPEED + (boost ? 0 : -50), 0, 255);
   }
 
- 
-    motors.setTargetSpeed(l_speed, r_speed);
+  motors.setTargetSpeed(l_speed, r_speed);
 
 
   //// Flipper ||||
@@ -50,6 +40,7 @@ void state_bumrush(){
   if(controller.Button(PSB_L1)){
     flipperMotor->run(RELEASE);
   }
+  
   if(controller.Button(PSB_L2)){
     brushless.setThrottle(150);
   }
@@ -58,7 +49,7 @@ void state_bumrush(){
   }
 
   // Exit this state if any of the normal buttons are pressed
-  if(controller.Button(PSB_PINK)){
+  if(controller.ButtonPressed(PSB_R3)){
     current_state = state_normal; // TODO - go back into the waiting state for testing
   }
 
