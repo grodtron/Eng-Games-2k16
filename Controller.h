@@ -48,7 +48,7 @@ class Controller : public PS2X{
         Serial.println(error);
       }
     }while(error);
-    Serial.println("Controller connected");
+//    Serial.println("Controller connected");
   }
 
   /**
