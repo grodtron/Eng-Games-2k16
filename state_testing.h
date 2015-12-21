@@ -8,9 +8,9 @@ void state_analog_graph(){
 
 
 void state_testing(){
-  //control::rami_stick();
-  //control::handbrake();
-  control::dpad_basic();
+  control::rami_stick();
+  control::handbrake();
+  //control::dpad_basic();
   control::brushless();
   control::flipper();
 }
