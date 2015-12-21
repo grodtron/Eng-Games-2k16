@@ -6,11 +6,11 @@
 //#define FORWARD  HIGH
 //#define BACKWARD LOW
 
-const int RIGHT_PWM  = 10;
-const int RIGHT_DIR  = A0;
+const int LEFT_PWM  = 10;
+const int LEFT_DIR  = A0;
 
-const int LEFT_PWM   = 5; // IN1 (enable)
-const int LEFT_DIR   = 3; // IN2 (direction)
+const int RIGHT_PWM   = 5; // IN1 (enable)
+const int RIGHT_DIR   = 3; // IN2 (direction)
 
 // Truth table somehow has no relationship to datasheet.
 // This is experimentally what it is.
