@@ -5,6 +5,7 @@
 #include <PS2X_lib.h>
 
 #include "Point.h"
+#include "MedianFilter.h"
 
 class Controller : public PS2X{
   private:
@@ -15,19 +16,28 @@ class Controller : public PS2X{
 
     int error_count;
 
+    MedianFilter<5> lxFilter;
+    MedianFilter<5> lyFilter;
+    MedianFilter<5> rxFilter;
+    MedianFilter<5> ryFilter;
+
+  public:
     Point left;
     Point right;
   private:
-    void update_analog_sticks(){      
-      left.x *= 95;
-      left.x += (Analog(PSS_RX) - 128) * 5;
-      left.x /= 100;
+    void update_analog_sticks(){
+      // TODO - once controls are finalized, remove any of these that are unused
+//      left.x = lxFilter.update(Analog(PSS_LX) - 128);
+//      left.y = lyFilter.update(128 - Analog(PSS_LY));
+//
+//      right.x = rxFilter.update(Analog(PSS_RX) - 128);
+//      right.y = ryFilter.update(128 - Analog(PSS_RY));
 
-      left.y *= 95;
-      left.y += (128 - Analog(PSS_RY)) * 5;
-      left.y /= 100;
+      left.x = Analog(PSS_LX) - 128;
+      left.y = 128 - Analog(PSS_LY);
 
-      //TODO
+      right.x = Analog(PSS_RX) - 128;
+      right.y = 128 - Analog(PSS_RY);
     }
 
   public:
@@ -44,7 +54,7 @@ class Controller : public PS2X{
         false/*rumble*/);
     
       if(error){
-        Debug.print("Controller Error: ");
+        Debug.print("CE");
         Debug.println(error);
       }
     }while(error);
@@ -71,11 +81,6 @@ class Controller : public PS2X{
       return true;
     }
   }
-
-  Point get_left(){
-    return left;
-  }
-
 };
 
 #endif

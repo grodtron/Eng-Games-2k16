@@ -47,8 +47,8 @@ namespace control {
       const int MINUS_DIVIDER = 4;
   
       static int last_speed = 0;
-      int speed = 2 * (127 - global::controller.Analog(PSS_RY)); // Up   is Positive
-      int ratio = global::controller.Analog(PSS_LX) - 127; // Left is Positive (I think)
+      int speed = 2 * global::controller.right.y; // Up   is Positive
+      int ratio = global::controller.left.x;      // Left is Positive (I think)
       bool dirIsLeft = ratio > 0;
       ratio = abs(ratio);
     
