@@ -1,11 +1,14 @@
-
 #ifndef CONTROLLER_H_
 #define CONTROLLER_H_
 
 #include <PS2X_lib.h>
 
 #include "Point.h"
-#include "MedianFilter.h"
+
+#ifdef USE_MEDIAN_FILTER
+  #include "MedianFilter.h"
+#endif
+
 
 class Controller : public PS2X{
   private:
@@ -16,10 +19,12 @@ class Controller : public PS2X{
 
     int error_count;
 
-    MedianFilter<5> lxFilter;
-    MedianFilter<5> lyFilter;
-    MedianFilter<5> rxFilter;
-    MedianFilter<5> ryFilter;
+    #ifdef USE_MEDIAN_FILTER
+      MedianFilter<5> lxFilter;
+      MedianFilter<5> lyFilter;
+      MedianFilter<5> rxFilter;
+      MedianFilter<5> ryFilter;
+    #endif
 
   public:
     Point left;
@@ -27,17 +32,19 @@ class Controller : public PS2X{
   private:
     void update_analog_sticks(){
       // TODO - once controls are finalized, remove any of these that are unused
-//      left.x = lxFilter.update(Analog(PSS_LX) - 128);
-//      left.y = lyFilter.update(128 - Analog(PSS_LY));
-//
-//      right.x = rxFilter.update(Analog(PSS_RX) - 128);
-//      right.y = ryFilter.update(128 - Analog(PSS_RY));
-
-      left.x = Analog(PSS_LX) - 128;
-      left.y = 128 - Analog(PSS_LY);
-
-      right.x = Analog(PSS_RX) - 128;
-      right.y = 128 - Analog(PSS_RY);
+      #ifdef USE_MEDIAN_FILTER
+        left.x = lxFilter.update(Analog(PSS_LX) - 128);
+        left.y = lyFilter.update(128 - Analog(PSS_LY));
+  
+        right.x = rxFilter.update(Analog(PSS_RX) - 128);
+        right.y = ryFilter.update(128 - Analog(PSS_RY));
+      #else
+        left.x = Analog(PSS_LX) - 128;
+        left.y = 128 - Analog(PSS_LY);
+  
+        right.x = Analog(PSS_RX) - 128;
+        right.y = 128 - Analog(PSS_RY);
+      #endif
     }
 
   public:

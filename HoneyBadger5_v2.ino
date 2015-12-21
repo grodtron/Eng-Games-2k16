@@ -2,7 +2,11 @@
 //#define SERIAL_DEBUG
 #include "serial.h"
 
+// If we want to use median filtering on controlller
+// (in case it has noisy spikes like ours used to.)
+//#define USE_MEDIAN_FILTER
 #include "Controller.h"
+
 #include "Brushless.h"
 #include "LimitSwitch.h"
 #include "Motors.h"
