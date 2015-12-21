@@ -1,9 +1,9 @@
 #include "controls.h"
 
 void state_analog_graph(){
-  Serial.print(global::controller.Analog(PSS_RY));
-  Serial.print(',');
-  Serial.println(micros());
+  Debug.print(global::controller.Analog(PSS_RY));
+  Debug.print(',');
+  Debug.println(micros());
 }
 
 

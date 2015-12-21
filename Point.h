@@ -11,12 +11,12 @@ struct Point {
     Point(int x, int y) : x(x), y(y) {}
 
     void print_self(const char * name){
-      Serial.print(name);
-      Serial.print(" (");
-      Serial.print(x);
-      Serial.print(", ");
-      Serial.print(y);
-      Serial.println(")");
+      Debug.print(name);
+      Debug.print(" (");
+      Debug.print(x);
+      Debug.print(", ");
+      Debug.print(y);
+      Debug.println(")");
     }
 
     int magnitude(){

@@ -44,11 +44,10 @@ class Controller : public PS2X{
         false/*rumble*/);
     
       if(error){
-        Serial.print("Controller Error: ");
-        Serial.println(error);
+        Debug.print("Controller Error: ");
+        Debug.println(error);
       }
     }while(error);
-//    Serial.println("Controller connected");
   }
 
   /**

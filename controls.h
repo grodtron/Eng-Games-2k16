@@ -27,11 +27,11 @@ namespace control {
   // Toggle on and off flipper
   inline void flipper(){
     if(global::controller.Button(PSB_CIRCLE)){
-      Serial.println("Flipper on");
+      Debug.println("Flipper on");
       FLIPPER_ON();
     }
     if(global::controller.Button(PSB_SQUARE)){
-      Serial.println("Flipper off");
+      Debug.println("Flipper off");
       FLIPPER_OFF();
     }
     
@@ -55,7 +55,7 @@ namespace control {
       int left  = speed;
       int right = speed;
     
-      Serial.println(speed);
+      Debug.println(speed);
     
       if(dirIsLeft){
         left  += ratio / PLUS_DIVIDER;

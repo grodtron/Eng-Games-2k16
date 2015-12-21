@@ -79,8 +79,6 @@ class Motors {
           
           current += dir * min(2, delta);  
         }
-
-//        Serial.print("Update : "); Serial.println(current);
       }
     }
   
@@ -89,12 +87,7 @@ class Motors {
     left(0), leftTarget(0),
     right(0), rightTarget(0),
     lastUpdateTime(millis() - DELAY_TIME)
-    {
-      // Increase Pin 10 (and 9) PWM frequency to 4kHz. Default is 500Hz
-      // Which is possibly too low for our retarded motors.
-      TCCR1B = (TCCR1B & ~0b111) | 0b010;
-      // See http://arduino.stackexchange.com/a/212
-      
+    { 
       pinMode(RIGHT_PWM, OUTPUT);
       pinMode(RIGHT_DIR, OUTPUT);
 
@@ -115,9 +108,9 @@ class Motors {
       if(leftTarget != newLeftTarget || rightTarget != newRightTarget){
         leftTarget  = newLeftTarget;
         rightTarget = newRightTarget;
-//        Serial.println("New Target: ");
-//        Serial.print  ("    Left : "); Serial.println(leftTarget);
-//        Serial.print  ("    Right: "); Serial.println(rightTarget);
+        Debug.println("New Target: ");
+        Debug.print  ("    Left : "); Debug.println(leftTarget);
+        Debug.print  ("    Right: "); Debug.println(rightTarget);
       }
     }
     

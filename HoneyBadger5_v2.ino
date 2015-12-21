@@ -1,3 +1,7 @@
+// If defined, then all Debug.<whatever> will go through to Serial
+//#define SERIAL_DEBUG
+#include "serial.h"
+
 #include "Controller.h"
 #include "Brushless.h"
 #include "LimitSwitch.h"
@@ -27,7 +31,7 @@ void turnOffFlipperMotor(){
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Starting...");
+  Debug.println("Starting...");
 
   global::brushless.init();
 
@@ -42,7 +46,7 @@ void setup() {
   current_state = state_testing;
 
   
-  Serial.println("Done!");
+  Debug.println("Done!");
 
 }
 
