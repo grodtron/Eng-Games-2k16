@@ -4,17 +4,21 @@
 namespace control {
 
   inline void next_state(state_func next_state){
-    if(global::controller.ButtonPressed(PSB_TRIANGLE)){ // TODO
-      current_state = next_state;
-    }
+    static boolean wasPressed = false;
+
+    if(wasPressed){
+      if( ! global::controller.Button(PSB_TRIANGLE)){
+        wasPressed = false;
+      }      
+    }else{
+      if(global::controller.Button(PSB_TRIANGLE)){
+        current_state = next_state;
+        wasPressed  = true;
+        Debug.println("Switching state!");
+      }      
+    }    
   }
   
-  inline void handbrake(){
-    if(global::controller.Button(PSB_L3) && global::controller.Button(PSB_R3)){
-      global::motors.setSpeedImmediate(0,0);
-    }
-  }
-
   // Toggle brushless on and off with R1
   inline void brushless(){
     if(global::controller.Button(PSB_CROSS)){
@@ -37,23 +41,32 @@ namespace control {
     
   }
 
-  void rami_stick(){
-    if(global::controller.Button(PSB_L2)){
-      global::motors.setTargetSpeed(-255, 255);
-    }else if(global::controller.Button(PSB_R2)){
-      global::motors.setTargetSpeed(255, -255);    
+  int16_t constrainSpeed(int16_t v, int16_t bakMax, int16_t fwdMax){
+    v = constrain(v, -255, 255);
+    if(v < 0){
+      return map(v, -255,      0,   bakMax, 0);
     }else{
-      const int PLUS_DIVIDER  = 2;
-      const int MINUS_DIVIDER = 4;
+      return map(v, 0, 255,    0,      fwdMax);
+    }
+  }
+
+  void rami_stick(){
+    if(global::controller.Button(PSB_L1)){
+      global::motors.setTargetSpeed(-200, 200);
+    }else if(global::controller.Button(PSB_R1)){
+      global::motors.setTargetSpeed(200, -200);    
+    }else{
+      const int PLUS_DIVIDER  = 1;
+      const int MINUS_DIVIDER = 2;
   
-      static int last_speed = 0;
-      int speed = 2 * global::controller.right.y; // Up   is Positive
-      int ratio = global::controller.left.x;      // Left is Positive (I think)
+      int speed = 2 * global::controller.right.y;  // Up   is Positive
+      int ratio = global::controller.left.x;       // Left is Positive (I think)
+      
       bool dirIsLeft = ratio > 0;
       ratio = abs(ratio);
     
-      int left  = speed;
-      int right = speed;
+      int16_t left  = speed;
+      int16_t right = speed;
     
       Debug.println(speed);
     
@@ -65,8 +78,8 @@ namespace control {
         left  -= ratio / MINUS_DIVIDER;    
       }
     
-      left  = constrain(left,  -255, 255);
-      right = constrain(right, -255, 255);
+      left  = constrainSpeed(left,  -200, 255);
+      right = constrainSpeed(right, -200, 255);
     
       global::motors.setTargetSpeed(left, right);
     }

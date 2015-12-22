@@ -12,27 +12,17 @@ const int LEFT_DIR  = A0;
 const int RIGHT_PWM   = 5; // IN1 (enable)
 const int RIGHT_DIR   = 3; // IN2 (direction)
 
-// Truth table somehow has no relationship to datasheet.
-// This is experimentally what it is.
-//
-//  IN1         IN2 
-//  direction   enable  
-//  0           0       off
-//  0           1       fwd
-//  1           0       bakwd
-//  1           1       off
-
-const int FLIPPER_ENABLE = 6;
-const int FLIPPER_DIR    = 4;
+const int FLIPPER_ENABLE = 4;
+const int FLIPPER_DIR    = 6;
 
 #define FLIPPER_ON() do { \
-  digitalWrite(FLIPPER_ENABLE, HIGH); \
-  digitalWrite(FLIPPER_DIR,    LOW); \
+  digitalWrite(FLIPPER_ENABLE, LOW); \
+  digitalWrite(FLIPPER_DIR,    HIGH); \
 } while(0)
 
 #define FLIPPER_OFF() do { \
   digitalWrite(FLIPPER_ENABLE, HIGH); \
-  digitalWrite(FLIPPER_DIR,    HIGH); \
+  digitalWrite(FLIPPER_DIR,    LOW); \
 } while(0)
 
 
@@ -53,8 +43,9 @@ int sign(int x){
 
 class Motors {
   public:
-    static const int DELAY_TIME = 1;
+    static const int DELAY_TIME = 4;
     static const int MIN_SPEED  = 85;
+//    static const int MIN_SPEED  = 110;
 
   private:
     static void updateValue(int & current, int & target){
@@ -77,7 +68,7 @@ class Motors {
           int dir   = sign(delta);
           delta     = abs(delta);
           
-          current += dir * min(2, delta);  
+          current += dir * min(8, delta);  
         }
       }
     }
@@ -105,13 +96,21 @@ class Motors {
     }
   
     void setTargetSpeed(int newLeftTarget, int newRightTarget){
-      if(leftTarget != newLeftTarget || rightTarget != newRightTarget){
-        leftTarget  = newLeftTarget;
-        rightTarget = newRightTarget;
-        Debug.println("New Target: ");
-        Debug.print  ("    Left : "); Debug.println(leftTarget);
-        Debug.print  ("    Right: "); Debug.println(rightTarget);
-      }
+//      if(leftTarget != newLeftTarget || rightTarget != newRightTarget){
+//
+//        if(abs(newLeftTarget) < MIN_SPEED && abs(newRightTarget) < MIN_SPEED){
+//          left  = leftTarget  = 0;
+//          right = rightTarget = 0;
+//        }else{
+//          leftTarget  = newLeftTarget;
+//          rightTarget = newRightTarget;          
+//        }
+//        
+//        Debug.println("New Target: ");
+//        Debug.print  ("    Left : "); Debug.println(leftTarget);
+//        Debug.print  ("    Right: "); Debug.println(rightTarget);
+//      }
+      setSpeedImmediate(newLeftTarget, newRightTarget);
     }
     
     void update(){
@@ -119,8 +118,8 @@ class Motors {
       if(now - DELAY_TIME > lastUpdateTime){
         lastUpdateTime = now;
         
-        updateValue(left,  leftTarget);
-        updateValue(right, rightTarget);
+//        updateValue(left,  leftTarget);
+//        updateValue(right, rightTarget);
        
         if(left >= 0){
           MOVE_SIDE_FWD(LEFT, left);
