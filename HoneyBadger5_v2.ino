@@ -59,4 +59,5 @@ void loop() {
     current_state();
   }
   global::motors.update();
+  global::limit.update();
 }
