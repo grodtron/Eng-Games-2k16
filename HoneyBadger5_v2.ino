@@ -1,5 +1,5 @@
 // If defined, then all Debug.<whatever> will go through to Serial
-//#define SERIAL_DEBUG
+#define SERIAL_DEBUG
 #include "serial.h"
 
 // If we want to use median filtering on controlller
@@ -34,7 +34,7 @@ void turnOffFlipperMotor(){
 }
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Debug.println("Starting...");
 
   global::brushless.init();
